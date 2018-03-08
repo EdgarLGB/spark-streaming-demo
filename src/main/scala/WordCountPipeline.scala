@@ -45,9 +45,9 @@ object WordCountPipeline {
       .map(word => (word, 1))
       .reduceByKey(_ + _)
       .foreachRDD(r => {
-        val singlePartition = r.coalesce(1).reduceByKey(_ + _)
+        val singlePartition = r.coalesce(1).sortBy(pair => pair._2, false)
         if (singlePartition.count() > 0) {
-          val df = new SimpleDateFormat("yyyy-MM-dd-hh:mm:ss")
+          val df = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss")
           val ts = df.format(System.currentTimeMillis)
           singlePartition.saveAsTextFile(hdfsURL + "/" + ts)
         }
